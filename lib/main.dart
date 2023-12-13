@@ -1,13 +1,14 @@
 import 'dart:convert';
 
+import 'package:apicall3/cons1.dart';
 import 'package:apicall3/model.dart';
+import 'package:apicall3/scrollable.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MaterialApp(
-    home: LastExampleScreen(),
-  ));
+      home: LastExampleScreen(), scrollBehavior: MyCustomScrollBehavior()));
 }
 
 class LastExampleScreen extends StatefulWidget {
@@ -16,6 +17,8 @@ class LastExampleScreen extends StatefulWidget {
   @override
   _LastExampleScreenState createState() => _LastExampleScreenState();
 }
+
+
 
 class _LastExampleScreenState extends State<LastExampleScreen> {
   Future<ProductsModel> getProductsApi() async {
@@ -33,43 +36,51 @@ class _LastExampleScreenState extends State<LastExampleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Api Course'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: FutureBuilder<ProductsModel>(
-                future: getProductsApi(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                        itemCount: snapshot.data!.data!.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ListTile(
-                                title: Text(snapshot
-                                    .data!.data![index].productName
-                                    .toString()),
-                              ),
-                            ],
-                          );
-                        });
-                  } else {
-                    return Text('Loading');
-                  }
-                },
-              ),
-            )
-          ],
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Api Course'),
         ),
-      ),
-    );
+        body: Container(
+          width: double.infinity,
+          height: 200,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: FutureBuilder<ProductsModel>(
+              future: getProductsApi(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data!.data!.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: 400,
+                            height: 100,
+                            color: Colors.amber,
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Column(
+                                  children: [
+                                    Text(snapshot.data!.data![index].productName
+                                        .toString()),
+                                   Image(image: NetworkImage("$imgBaseUrl${snapshot.data!.data![index].id.toString()}/${snapshot.data!.data![index].mainImage.toString()}"))
+                                        
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      });
+                } else {
+                  return Text('Loading');
+                }
+              },
+            ),
+          ),
+        ));
   }
 }
